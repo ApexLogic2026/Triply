@@ -63,9 +63,14 @@ const tripEnd = isLastTrip ? rangeEnd : (trip.end < rangeEnd ? trip.end : rangeE
                 <div style={{ padding: '12px 16px', background: '#f5f5f3', display: 'flex', alignItems: 'center', gap: 8 }}>
   <div style={{ width: 10, height: 10, borderRadius: '50%', background: trip.color, flexShrink: 0 }} />
   <span style={{ fontSize: 14, fontWeight: 600, flex: 1 }}>{trip.name}</span>
-  {businessFlags[trip.start] && (
+  {(() => {
+  const recentCheckinDate = Object.keys(businessFlags)
+    .filter(d => d <= trip.start)
+    .sort((a, b) => b.localeCompare(a))[0];
+  return recentCheckinDate && businessFlags[recentCheckinDate] ? (
     <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#E6F1FB', color: '#185FA5', fontWeight: 500 }}>💼 Business</span>
-  )}
+  ) : null;
+})()}
   <span style={{ fontSize: 11, color: '#999' }}>{tripStart} – {tripEnd}</span>
   <span style={{ fontSize: 11, color: '#1D9E75', fontWeight: 500, marginLeft: 8 }}>{tripDates.length} day{tripDates.length > 1 ? 's' : ''}</span>
   <span style={{ fontSize: 13, fontWeight: 500, color: '#0F6E56', marginLeft: 8 }}>{tripExps.length} expense{tripExps.length !== 1 ? 's' : ''}</span>
