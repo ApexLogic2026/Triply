@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import type { Trip, Expenses, Checkins, BoardingPass, Expense } from './types';
+import type { Trip, Expenses, Checkins, BusinessFlags, BoardingPass, Expense } from './types';
 import { supabase } from './utils/supabase';
 import Sidebar from './components/Sidebar';
 import Calendar from './components/Calendar';
@@ -30,6 +30,7 @@ export default function App() {
   const [checkins, setCheckins] = useState<Checkins>({});
   const [expenses, setExpenses] = useState<Expenses>({});
   const [boardingPasses, setBoardingPasses] = useState<BoardingPass[]>([]);
+  const [businessFlags, setBusinessFlags] = useState<BusinessFlags>({});
   const [loading, setLoading] = useState(true);
   const [screen, setScreen] = useState('calendar');
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -43,8 +44,13 @@ export default function App() {
     setLoading(true);
     const { data: checkinsData } = await supabase.from('checkins').select('*');
     const loadedCheckins: Checkins = {};
-    (checkinsData || []).forEach((c: any) => { loadedCheckins[c.date] = c.location; });
-    setCheckins(loadedCheckins);
+    const loadedBusiness: BusinessFlags = {};
+(checkinsData || []).forEach((c: any) => {
+  loadedCheckins[c.date] = c.location;
+  if (c.is_business) loadedBusiness[c.date] = true;
+});
+setCheckins(loadedCheckins);
+setBusinessFlags(loadedBusiness);
     setTrips(generateTripsFromCheckins(loadedCheckins));
 
     const { data: expensesData } = await supabase.from('expenses').select('*');
@@ -71,11 +77,13 @@ export default function App() {
   function fmt(d: Date) { return d.toISOString().split('T')[0]; }
 
 
-  async function handleCheckin(date: string, location: string, boardingPassImage?: string) {
+  async function handleCheckin(date: string, location: string, boardingPassImage?: string, isBusiness?: boolean) {
   const newCheckins = { ...checkins, [date]: location };
+  const newFlags = { ...businessFlags, [date]: !!isBusiness };
   setCheckins(newCheckins);
+  setBusinessFlags(newFlags);
   setTrips(generateTripsFromCheckins(newCheckins));
-  await supabase.from('checkins').upsert({ date, location });
+  await supabase.from('checkins').upsert({ date, location, is_business: !!isBusiness });
 
   // Save boarding pass as a special expense entry
   if (boardingPassImage) {
@@ -196,13 +204,14 @@ export default function App() {
     <div style={{ width: window.innerWidth < 768 ? '100%' : 320, flexShrink: 0, overflowY: 'auto' }}>
       {selectedDate ? (
         <DayPanel
-          date={selectedDate}
-          checkins={checkins}
-          expenses={expenses}
-          onCheckin={handleCheckin}
-          onAddExpense={handleAddExpense}
-          onViewReceipt={(src, caption) => setLightbox({ src, caption })}
-        />
+  date={selectedDate}
+  checkins={checkins}
+  expenses={expenses}
+  businessFlags={businessFlags}
+  onCheckin={handleCheckin}
+  onAddExpense={handleAddExpense}
+  onViewReceipt={(src, caption) => setLightbox({ src, caption })}
+/>
       ) : (
         <div style={{ fontSize: 13, color: '#999', marginTop: 40, textAlign: 'center' }}>
           👆 Click a date to view details
