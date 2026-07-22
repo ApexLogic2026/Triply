@@ -29,3 +29,4 @@ export interface BoardingPass {
 
 export type Expenses = Record<string, Expense[]>;
 export type Checkins = Record<string, string>;
+export type BusinessFlags = Record<string, boolean>;
