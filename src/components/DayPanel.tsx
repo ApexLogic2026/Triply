@@ -31,7 +31,12 @@ const [showForm, setShowForm] = useState(false);
 const [customLoc, setCustomLoc] = useState('');
 const [bpImage, setBpImage] = useState<string | null>(null);
 const [bpFileName, setBpFileName] = useState<string | null>(null);
-const [isBusiness, setIsBusiness] = useState(false);
+const [isBusinessOverride, setIsBusinessOverride] = useState<boolean | null>(null);
+const recentCheckinDate = Object.keys(businessFlags)
+  .filter(d => d <= date)
+  .sort((a, b) => b.localeCompare(a))[0];
+const currentBusiness = recentCheckinDate ? !!businessFlags[recentCheckinDate] : false;
+const isBusiness = isBusinessOverride !== null ? isBusinessOverride : currentBusiness;
 const bpFileRef = useRef<HTMLInputElement>(null);
   const loc = checkins[date] || Object.entries(checkins)
   .filter(([d]) => d <= date)
@@ -155,7 +160,7 @@ const bpFileRef = useRef<HTMLInputElement>(null);
             )}
           </div>
          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-  <div onClick={() => setIsBusiness(!isBusiness)}
+  <div onClick={() => setIsBusinessOverride(!isBusiness)}
     style={{ width: 36, height: 20, borderRadius: 10, background: isBusiness ? '#1D9E75' : '#e5e5e3', position: 'relative', cursor: 'pointer', flexShrink: 0 }}>
     <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, left: isBusiness ? 18 : 2, transition: 'left .2s' }} />
   </div>
