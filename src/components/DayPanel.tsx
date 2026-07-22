@@ -25,11 +25,12 @@ interface Props {
 }
 
 export default function DayPanel({ date, checkins, expenses, onCheckin, onAddExpense, onViewReceipt }: Props) {
-  const [showCheckin, setShowCheckin] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [customLoc, setCustomLoc] = useState('');
+const [showCheckin, setShowCheckin] = useState(false);
+const [showForm, setShowForm] = useState(false);
+const [customLoc, setCustomLoc] = useState('');
 const [bpImage, setBpImage] = useState<string | null>(null);
 const [bpFileName, setBpFileName] = useState<string | null>(null);
+const [isBusiness, setIsBusiness] = useState(false);
 const bpFileRef = useRef<HTMLInputElement>(null);
   const loc = checkins[date] || Object.entries(checkins)
   .filter(([d]) => d <= date)
