@@ -1,3 +1,4 @@
+import type { Expense, Checkins, Expenses, BusinessFlags } from '../types/index';
 import { useState, useRef  } from 'react';
 import { IconMapPin, IconReceipt } from '@tabler/icons-react';
 import type { Expense, Checkins, Expenses } from '../types';
@@ -19,12 +20,13 @@ interface Props {
   date: string;
   checkins: Checkins;
   expenses: Expenses;
-  onCheckin: (date: string, location: string, boardingPass?: string) => void;
+  businessFlags: BusinessFlags;
+  onCheckin: (date: string, location: string, boardingPass?: string, isBusiness?: boolean) => void;
   onAddExpense: (date: string, expense: Expense) => void;
   onViewReceipt: (src: string, caption: string) => void;
 }
 
-export default function DayPanel({ date, checkins, expenses, onCheckin, onAddExpense, onViewReceipt }: Props) {
+export default function DayPanel({ date, checkins, expenses, businessFlags, onCheckin, onAddExpense, onViewReceipt }: Props) {
 const [showCheckin, setShowCheckin] = useState(false);
 const [showForm, setShowForm] = useState(false);
 const [customLoc, setCustomLoc] = useState('');
@@ -47,13 +49,18 @@ const bpFileRef = useRef<HTMLInputElement>(null);
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <span style={{ fontSize: 13, fontWeight: 500 }}>{dateLabel}</span>
-        {loc ? (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', borderRadius: 20, fontSize: 11, background: '#E1F5EE', color: '#0F6E56', fontWeight: 500 }}>
-            <IconMapPin size={12} /> {loc}
-          </span>
-        ) : (
-          <span style={{ fontSize: 11, color: '#999' }}>No check-in</span>
-        )}
+       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+  {loc ? (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', borderRadius: 20, fontSize: 11, background: '#E1F5EE', color: '#0F6E56', fontWeight: 500 }}>
+      <IconMapPin size={12} /> {loc}
+    </span>
+  ) : (
+    <span style={{ fontSize: 11, color: '#999' }}>No check-in</span>
+  )}
+  {businessFlags[date] && (
+    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#E6F1FB', color: '#185FA5', fontWeight: 500 }}>💼 Business</span>
+  )}
+</div>
       </div>
 
       {/* Expenses */}
@@ -143,6 +150,14 @@ const bpFileRef = useRef<HTMLInputElement>(null);
               </>
             )}
           </div>
+         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+  <div onClick={() => setIsBusiness(!isBusiness)}
+    style={{ width: 36, height: 20, borderRadius: 10, background: isBusiness ? '#1D9E75' : '#e5e5e3', position: 'relative', cursor: 'pointer', flexShrink: 0 }}>
+    <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, left: isBusiness ? 18 : 2, transition: 'left .2s' }} />
+  </div>
+  <span style={{ fontSize: 12, color: '#555' }}>Business trip</span>
+  {isBusiness && <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#E6F1FB', color: '#185FA5', fontWeight: 500 }}>💼</span>}
+</div>
           <input ref={bpFileRef} type="file" accept="image/*,.pdf" style={{ display: 'none' }}
             onChange={e => {
               const file = e.target.files?.[0];
