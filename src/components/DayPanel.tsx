@@ -56,9 +56,14 @@ const bpFileRef = useRef<HTMLInputElement>(null);
   ) : (
     <span style={{ fontSize: 11, color: '#999' }}>No check-in</span>
   )}
-  {businessFlags[date] && (
+  {(() => {
+  const recentCheckinDate = Object.keys(businessFlags)
+    .filter(d => d <= date)
+    .sort((a, b) => b.localeCompare(a))[0];
+  return recentCheckinDate && businessFlags[recentCheckinDate] ? (
     <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#E6F1FB', color: '#185FA5', fontWeight: 500 }}>💼 Business</span>
-  )}
+  ) : null;
+})()}
 </div>
       </div>
 
