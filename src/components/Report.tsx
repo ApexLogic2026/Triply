@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IconReceipt, IconDownload, IconPlane } from '@tabler/icons-react';
-import type { Trip, Expenses, Checkins, BoardingPass } from '../types/index';
+import type { Trip, Expenses, Checkins, BoardingPass, BusinessFlags } from '../types/index';
 import { exportCSV } from '../utils/csvExport';
 
 
@@ -9,6 +9,7 @@ interface Props {
   expenses: Expenses;
   checkins: Checkins;
   boardingPasses: BoardingPass[];
+  businessFlags: BusinessFlags;
   selectedTrip: string;
   onSelectTrip: (id: string) => void;
 }
@@ -23,7 +24,7 @@ function getDatesInRange(start: string, end: string): string[] {
   return dates;
 }
 
-export default function Report({ trips, expenses, checkins, boardingPasses }: Props) {
+export default function Report({ trips, expenses, checkins, boardingPasses, businessFlags }: Props) {
   const today = fmt(new Date());
   const [rangeStart, setRangeStart] = useState(today);
   const [rangeEnd, setRangeEnd] = useState(today);
@@ -62,7 +63,10 @@ const tripEnd = isLastTrip ? rangeEnd : (trip.end < rangeEnd ? trip.end : rangeE
                 <div style={{ padding: '12px 16px', background: '#f5f5f3', display: 'flex', alignItems: 'center', gap: 8 }}>
   <div style={{ width: 10, height: 10, borderRadius: '50%', background: trip.color, flexShrink: 0 }} />
   <span style={{ fontSize: 14, fontWeight: 600, flex: 1 }}>{trip.name}</span>
-<span style={{ fontSize: 11, color: '#999' }}>{tripStart} – {tripEnd}</span>
+  {businessFlags[trip.start] && (
+    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#E6F1FB', color: '#185FA5', fontWeight: 500 }}>💼 Business</span>
+  )}
+  <span style={{ fontSize: 11, color: '#999' }}>{tripStart} – {tripEnd}</span>
   <span style={{ fontSize: 11, color: '#1D9E75', fontWeight: 500, marginLeft: 8 }}>{tripDates.length} day{tripDates.length > 1 ? 's' : ''}</span>
   <span style={{ fontSize: 13, fontWeight: 500, color: '#0F6E56', marginLeft: 8 }}>{tripExps.length} expense{tripExps.length !== 1 ? 's' : ''}</span>
 </div>
