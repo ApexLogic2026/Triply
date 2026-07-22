@@ -229,13 +229,14 @@ setBusinessFlags(loadedBusiness);
           )}
           {screen === 'report' && (
             <Report
-              trips={trips}
-              expenses={expenses}
-              checkins={checkins}
-              boardingPasses={boardingPasses}
-              selectedTrip={reportTrip}
-              onSelectTrip={setReportTrip}
-            />
+  trips={trips}
+  expenses={expenses}
+  checkins={checkins}
+  boardingPasses={boardingPasses}
+  businessFlags={businessFlags}
+  selectedTrip={reportTrip}
+  onSelectTrip={setReportTrip}
+/>
           )}
         </div>
       </div>
