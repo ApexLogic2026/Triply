@@ -1,0 +1,3 @@
+Supabase
+database: triply
+password: Joiyi1229*triply
