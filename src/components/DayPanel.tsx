@@ -1,7 +1,6 @@
 import type { Expense, Checkins, Expenses, BusinessFlags } from '../types/index';
 import { useState, useRef  } from 'react';
 import { IconMapPin, IconReceipt } from '@tabler/icons-react';
-import type { Expense, Checkins, Expenses } from '../types';
 import { fmtHKD } from '../utils/currency';
 import ExpenseForm from './ExpenseForm';
 
@@ -83,7 +82,7 @@ const bpFileRef = useRef<HTMLInputElement>(null);
                 )}
               </div>
               <div style={{ fontSize: 12, fontWeight: 500, marginLeft: 8 }}>
-                {e.currency !== 'HKD' ? `${e.currency} ${e.amount.toLocaleString()} ` : ''}
+                {e.currency} {e.amount.toLocaleString()}
                 
               </div>
             </div>
@@ -114,7 +113,7 @@ const bpFileRef = useRef<HTMLInputElement>(null);
           <div style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>Select location</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
             {LOCATIONS.map(l => (
-              <div key={l} onClick={() => { onCheckin(date, l, bpImage || undefined); setShowCheckin(false); setBpImage(null); setBpFileName(null); }}
+              <div key={l} onClick={() => { onCheckin(date, l, bpImage || undefined, isBusiness); setShowCheckin(false); setBpImage(null); setBpFileName(null); }}
                 style={{ padding: '4px 12px', borderRadius: 20, border: '0.5px solid #e5e5e3', fontSize: 12, cursor: 'pointer', background: loc === l ? '#1D9E75' : '#fff', color: loc === l ? '#fff' : '#555' }}>
                 {l}
               </div>
@@ -124,7 +123,7 @@ const bpFileRef = useRef<HTMLInputElement>(null);
             <input value={customLoc} onChange={e => setCustomLoc(e.target.value)}
               placeholder="Or type a custom city..."
               style={{ flex: 1, fontSize: 12, padding: '5px 10px', borderRadius: 6, border: '0.5px solid #e5e5e3', background: '#fff' }} />
-            <button onClick={() => { if (customLoc.trim()) { onCheckin(date, customLoc.trim(), bpImage || undefined); setShowCheckin(false); setCustomLoc(''); setBpImage(null); setBpFileName(null); } }}
+            <button onClick={() => { if (customLoc.trim()) { onCheckin(date, customLoc.trim(), bpImage || undefined, isBusiness); setShowCheckin(false); setCustomLoc(''); setBpImage(null); setBpFileName(null); } }}
               style={{ padding: '5px 12px', borderRadius: 6, border: 'none', background: '#1D9E75', color: '#fff', fontSize: 12, cursor: 'pointer' }}>
               Set
             </button>
