@@ -162,7 +162,7 @@ export default function Report({ trips, expenses, checkins, boardingPasses, busi
             </div>
           )}
 
-          <button onClick={() => exportCSV(expenses, checkins, rangeStart, rangeEnd)}
+          <button onClick={() => exportCSV(expenses, checkins, rangeStart, rangeEnd, businessFlags)}
             style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 6, border: '0.5px solid #e5e5e3', background: '#fff', fontSize: 12, cursor: 'pointer', marginTop: 8 }}>
             <IconDownload size={14} /> Export CSV
           </button>
