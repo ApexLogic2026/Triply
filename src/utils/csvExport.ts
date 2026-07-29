@@ -8,12 +8,6 @@ function getDatesInRange(start: string, end: string): string[] {
   return dates;
 }
 
-function getRecentCheckin(date: string, checkins: Checkins): string {
-  return checkins[date] || Object.entries(checkins)
-    .filter(([d]) => d <= date)
-    .sort((a, b) => b[0].localeCompare(a[0]))[0]?.[1] || 'Unknown';
-}
-
 function isBusiness(date: string, businessFlags: BusinessFlags): boolean {
   const recentDate = Object.keys(businessFlags)
     .filter(d => d <= date)
