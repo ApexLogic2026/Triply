@@ -39,8 +39,8 @@ const currentBusiness = recentCheckinDate ? !!businessFlags[recentCheckinDate] :
 const [isBusiness, setIsBusiness] = useState(currentBusiness);
 
 useEffect(() => {
-  setIsBusiness(currentBusiness);
-}, [date]);
+  setIsBusiness(businessFlags[date] ?? false);
+}, [date, businessFlags]);
 const bpFileRef = useRef<HTMLInputElement>(null);
   const loc = checkins[date] || Object.entries(checkins)
   .filter(([d]) => d <= date)
