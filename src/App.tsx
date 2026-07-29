@@ -44,10 +44,10 @@ export default function App() {
     setLoading(true);
     const { data: checkinsData } = await supabase.from('checkins').select('*');
     const loadedCheckins: Checkins = {};
-    const loadedBusiness: BusinessFlags = {};
+const loadedBusiness: BusinessFlags = {};
 (checkinsData || []).forEach((c: any) => {
   loadedCheckins[c.date] = c.location;
-  if (c.is_business) loadedBusiness[c.date] = true;
+  loadedBusiness[c.date] = !!c.is_business;
 });
 setCheckins(loadedCheckins);
 setBusinessFlags(loadedBusiness);
