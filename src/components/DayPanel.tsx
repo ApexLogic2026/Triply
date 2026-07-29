@@ -121,8 +121,80 @@ const bpFileRef = useRef<HTMLInputElement>(null);
       </div>
 
       {/* Check-in panel */}
-      {showCheckin && (
-        <div style={{ background: '#fff', border: '0.5px solid #e5e5e3', borderRadius: 8, padding: 12, marginTop: 8 }}>
+     {showCheckin && (
+  <div style={{ background: '#fff', border: '0.5px solid #e5e5e3', borderRadius: 8, padding: 12, marginTop: 8 }}>
+    <div style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>Select location</div>
+    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+      {LOCATIONS.map(l => (
+        <div key={l} onClick={() => setCustomLoc(l)}
+          style={{ padding: '4px 12px', borderRadius: 20, border: '0.5px solid #e5e5e3', fontSize: 12, cursor: 'pointer', background: customLoc === l ? '#1D9E75' : '#fff', color: customLoc === l ? '#fff' : '#555' }}>
+          {l}
+        </div>
+      ))}
+    </div>
+    <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+      <input value={customLoc} onChange={e => setCustomLoc(e.target.value)}
+        placeholder="Or type a custom city..."
+        style={{ flex: 1, fontSize: 12, padding: '5px 10px', borderRadius: 6, border: '0.5px solid #e5e5e3', background: '#fff' }} />
+    </div>
+    <div onClick={() => bpFileRef.current?.click()}
+      style={{ border: bpImage ? '0.5px solid #e5e5e3' : '1.5px dashed #ccc', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: bpImage ? '#f9f9f8' : '#fff', marginBottom: 8 }}>
+      {bpImage ? (
+        <>
+          <img src={bpImage} alt="Boarding pass" style={{ width: 36, height: 36, borderRadius: 6, objectFit: 'cover' }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 12, color: '#333' }}>{bpFileName}</div>
+            <div style={{ fontSize: 11, color: '#999' }}>Boarding pass uploaded</div>
+          </div>
+          <span onClick={e => { e.stopPropagation(); setBpImage(null); setBpFileName(null); }} style={{ fontSize: 13, color: '#999', cursor: 'pointer' }}>✕</span>
+        </>
+      ) : (
+        <>
+          <div style={{ width: 36, height: 36, borderRadius: 6, background: '#f5f5f3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🎫</div>
+          <div>
+            <div style={{ fontSize: 12, color: '#666' }}>Upload boarding pass <span style={{ color: '#999', fontWeight: 400 }}>(optional)</span></div>
+            <div style={{ fontSize: 11, color: '#999' }}>JPG, PNG or PDF</div>
+          </div>
+        </>
+      )}
+    </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+      <div onClick={() => setIsBusiness(!isBusiness)}
+        style={{ width: 36, height: 20, borderRadius: 10, background: isBusiness ? '#1D9E75' : '#e5e5e3', position: 'relative', cursor: 'pointer', flexShrink: 0 }}>
+        <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, left: isBusiness ? 18 : 2, transition: 'left .2s' }} />
+      </div>
+      <span style={{ fontSize: 12, color: '#555' }}>Business trip</span>
+      {isBusiness && <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#E6F1FB', color: '#185FA5', fontWeight: 500 }}>💼</span>}
+    </div>
+    <div style={{ display: 'flex', gap: 6 }}>
+      <button
+        onClick={() => {
+          if (customLoc.trim()) {
+            onCheckin(date, customLoc.trim(), bpImage || undefined, isBusiness);
+            setShowCheckin(false);
+            setBpImage(null);
+            setBpFileName(null);
+          }
+        }}
+        style={{ padding: '6px 16px', borderRadius: 6, border: 'none', background: '#1D9E75', color: '#fff', fontSize: 12, cursor: 'pointer', fontWeight: 500 }}>
+        Save
+      </button>
+      <button
+        onClick={() => { setShowCheckin(false); setBpImage(null); setBpFileName(null); }}
+        style={{ padding: '6px 14px', borderRadius: 6, border: '0.5px solid #e5e5e3', background: '#fff', fontSize: 12, cursor: 'pointer' }}>
+        Cancel
+      </button>
+    </div>
+    <input ref={bpFileRef} type="file" accept="image/*,.pdf" style={{ display: 'none' }}
+      onChange={e => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => { setBpImage(ev.target?.result as string); setBpFileName(file.name); };
+        reader.readAsDataURL(file);
+      }} />
+  </div>
+)}
           <div style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>Select location</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
             {LOCATIONS.map(l => (
