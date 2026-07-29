@@ -1,5 +1,4 @@
 import type { Expense, Checkins, Expenses, BusinessFlags } from '../types/index';
-import { useState, useRef  } from 'react';
 import { IconMapPin, IconReceipt } from '@tabler/icons-react';
 import { fmtHKD } from '../utils/currency';
 import ExpenseForm from './ExpenseForm';
@@ -164,7 +163,7 @@ const bpFileRef = useRef<HTMLInputElement>(null);
             )}
           </div>
          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-  <div onClick={() => setIsBusinessOverride(!isBusiness)}
+  <div onClick={() => setIsBusiness(!isBusiness)}
     style={{ width: 36, height: 20, borderRadius: 10, background: isBusiness ? '#1D9E75' : '#e5e5e3', position: 'relative', cursor: 'pointer', flexShrink: 0 }}>
     <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, left: isBusiness ? 18 : 2, transition: 'left .2s' }} />
   </div>
