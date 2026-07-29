@@ -26,53 +26,51 @@ interface Props {
 }
 
 export default function DayPanel({ date, checkins, expenses, businessFlags, onCheckin, onAddExpense, onViewReceipt }: Props) {
-const [showCheckin, setShowCheckin] = useState(false);
-const [showForm, setShowForm] = useState(false);
-const [customLoc, setCustomLoc] = useState('');
-const [bpImage, setBpImage] = useState<string | null>(null);
-const [bpFileName, setBpFileName] = useState<string | null>(null);
-const recentCheckinDate = Object.keys(businessFlags)
-  .filter(d => d <= date)
-  .sort((a, b) => b.localeCompare(a))[0];
-const currentBusiness = recentCheckinDate ? !!businessFlags[recentCheckinDate] : false;
-const [isBusiness, setIsBusiness] = useState(currentBusiness);
+  const [showCheckin, setShowCheckin] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [customLoc, setCustomLoc] = useState('');
+  const [bpImage, setBpImage] = useState<string | null>(null);
+  const [bpFileName, setBpFileName] = useState<string | null>(null);
+  const [isBusiness, setIsBusiness] = useState(false);
+  const bpFileRef = useRef<HTMLInputElement>(null);
 
-useEffect(() => {
-  setIsBusiness(businessFlags[date] ?? false);
-}, [date, businessFlags]);
-const bpFileRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    setIsBusiness(businessFlags[date] ?? false);
+    setCustomLoc('');
+  }, [date, businessFlags]);
+
   const loc = checkins[date] || Object.entries(checkins)
-  .filter(([d]) => d <= date)
-  .sort((a, b) => b[0].localeCompare(a[0]))[0]?.[1] || null;
+    .filter(([d]) => d <= date)
+    .sort((a, b) => b[0].localeCompare(a[0]))[0]?.[1] || null;
+
   const exps = expenses[date] || [];
   const total = exps.reduce((s, e) => s + e.hkdAmount, 0);
   const cat = (id: string) => CATS.find(c => c.id === id) || CATS[5];
-
   const parsedDate = new Date(date + 'T00:00:00');
   const dateLabel = parsedDate.toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' });
+
+  const recentCheckinDate = Object.keys(businessFlags)
+    .filter(d => d <= date)
+    .sort((a, b) => b.localeCompare(a))[0];
+  const isBusinessDay = recentCheckinDate ? !!businessFlags[recentCheckinDate] : false;
 
   return (
     <div style={{ background: '#f5f5f3', borderRadius: 10, padding: 14, marginBottom: 12 }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <span style={{ fontSize: 13, fontWeight: 500 }}>{dateLabel}</span>
-       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-  {loc ? (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', borderRadius: 20, fontSize: 11, background: '#E1F5EE', color: '#0F6E56', fontWeight: 500 }}>
-      <IconMapPin size={12} /> {loc}
-    </span>
-  ) : (
-    <span style={{ fontSize: 11, color: '#999' }}>No check-in</span>
-  )}
-  {(() => {
-  const recentCheckinDate = Object.keys(businessFlags)
-    .filter(d => d <= date)
-    .sort((a, b) => b.localeCompare(a))[0];
-  return recentCheckinDate && businessFlags[recentCheckinDate] ? (
-    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#E6F1FB', color: '#185FA5', fontWeight: 500 }}>💼 Business</span>
-  ) : null;
-})()}
-</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {loc ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', borderRadius: 20, fontSize: 11, background: '#E1F5EE', color: '#0F6E56', fontWeight: 500 }}>
+              <IconMapPin size={12} /> {loc}
+            </span>
+          ) : (
+            <span style={{ fontSize: 11, color: '#999' }}>No check-in</span>
+          )}
+          {isBusinessDay && (
+            <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#E6F1FB', color: '#185FA5', fontWeight: 500 }}>💼 Business</span>
+          )}
+        </div>
       </div>
 
       {/* Expenses */}
@@ -89,14 +87,13 @@ const bpFileRef = useRef<HTMLInputElement>(null);
                   <img
                     src={e.receipt}
                     alt="receipt"
-                    onClick={() => onViewReceipt(e.receipt!, `${e.desc} · ${fmtHKD(e.hkdAmount)}`)}
+                    onClick={() => onViewReceipt(e.receipt!, `${e.desc}`)}
                     style={{ width: 28, height: 28, borderRadius: 4, objectFit: 'cover', border: '0.5px solid #e5e5e3', cursor: 'pointer' }}
                   />
                 )}
               </div>
               <div style={{ fontSize: 12, fontWeight: 500, marginLeft: 8 }}>
                 {e.currency} {e.amount.toLocaleString()}
-                
               </div>
             </div>
           ))}
@@ -126,23 +123,17 @@ const bpFileRef = useRef<HTMLInputElement>(null);
           <div style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>Select location</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
             {LOCATIONS.map(l => (
-              <div key={l} onClick={() => { onCheckin(date, l, bpImage || undefined, isBusiness); setShowCheckin(false); setBpImage(null); setBpFileName(null); }}
-                style={{ padding: '4px 12px', borderRadius: 20, border: '0.5px solid #e5e5e3', fontSize: 12, cursor: 'pointer', background: loc === l ? '#1D9E75' : '#fff', color: loc === l ? '#fff' : '#555' }}>
+              <div key={l} onClick={() => setCustomLoc(l)}
+                style={{ padding: '4px 12px', borderRadius: 20, border: '0.5px solid #e5e5e3', fontSize: 12, cursor: 'pointer', background: customLoc === l ? '#1D9E75' : '#fff', color: customLoc === l ? '#fff' : '#555' }}>
                 {l}
               </div>
             ))}
           </div>
-          <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
-            <input value={customLoc} onChange={e => setCustomLoc(e.target.value)}
-              placeholder="Or type a custom city..."
-              style={{ flex: 1, fontSize: 12, padding: '5px 10px', borderRadius: 6, border: '0.5px solid #e5e5e3', background: '#fff' }} />
-            <button onClick={() => { if (customLoc.trim()) { onCheckin(date, customLoc.trim(), bpImage || undefined, isBusiness); setShowCheckin(false); setCustomLoc(''); setBpImage(null); setBpFileName(null); } }}
-              style={{ padding: '5px 12px', borderRadius: 6, border: 'none', background: '#1D9E75', color: '#fff', fontSize: 12, cursor: 'pointer' }}>
-              Set
-            </button>
-          </div>
+          <input value={customLoc} onChange={e => setCustomLoc(e.target.value)}
+            placeholder="Or type a custom city..."
+            style={{ width: '100%', fontSize: 12, padding: '5px 10px', borderRadius: 6, border: '0.5px solid #e5e5e3', background: '#fff', marginBottom: 8, boxSizing: 'border-box' }} />
           <div onClick={() => bpFileRef.current?.click()}
-            style={{ border: bpImage ? '0.5px solid #e5e5e3' : '1.5px dashed #ccc', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: bpImage ? '#f9f9f8' : '#fff' }}>
+            style={{ border: bpImage ? '0.5px solid #e5e5e3' : '1.5px dashed #ccc', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: bpImage ? '#f9f9f8' : '#fff', marginBottom: 8 }}>
             {bpImage ? (
               <>
                 <img src={bpImage} alt="Boarding pass" style={{ width: 36, height: 36, borderRadius: 6, objectFit: 'cover' }} />
@@ -162,14 +153,33 @@ const bpFileRef = useRef<HTMLInputElement>(null);
               </>
             )}
           </div>
-         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-  <div onClick={() => setIsBusiness(!isBusiness)}
-    style={{ width: 36, height: 20, borderRadius: 10, background: isBusiness ? '#1D9E75' : '#e5e5e3', position: 'relative', cursor: 'pointer', flexShrink: 0 }}>
-    <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, left: isBusiness ? 18 : 2, transition: 'left .2s' }} />
-  </div>
-  <span style={{ fontSize: 12, color: '#555' }}>Business trip</span>
-  {isBusiness && <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#E6F1FB', color: '#185FA5', fontWeight: 500 }}>💼</span>}
-</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div onClick={() => setIsBusiness(!isBusiness)}
+              style={{ width: 36, height: 20, borderRadius: 10, background: isBusiness ? '#1D9E75' : '#e5e5e3', position: 'relative', cursor: 'pointer', flexShrink: 0 }}>
+              <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, left: isBusiness ? 18 : 2, transition: 'left .2s' }} />
+            </div>
+            <span style={{ fontSize: 12, color: '#555' }}>Business trip</span>
+            {isBusiness && <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#E6F1FB', color: '#185FA5', fontWeight: 500 }}>💼</span>}
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              onClick={() => {
+                if (customLoc.trim()) {
+                  onCheckin(date, customLoc.trim(), bpImage || undefined, isBusiness);
+                  setShowCheckin(false);
+                  setBpImage(null);
+                  setBpFileName(null);
+                }
+              }}
+              style={{ padding: '6px 16px', borderRadius: 6, border: 'none', background: '#1D9E75', color: '#fff', fontSize: 12, cursor: 'pointer', fontWeight: 500 }}>
+              Save
+            </button>
+            <button
+              onClick={() => { setShowCheckin(false); setBpImage(null); setBpFileName(null); }}
+              style={{ padding: '6px 14px', borderRadius: 6, border: '0.5px solid #e5e5e3', background: '#fff', fontSize: 12, cursor: 'pointer' }}>
+              Cancel
+            </button>
+          </div>
           <input ref={bpFileRef} type="file" accept="image/*,.pdf" style={{ display: 'none' }}
             onChange={e => {
               const file = e.target.files?.[0];
