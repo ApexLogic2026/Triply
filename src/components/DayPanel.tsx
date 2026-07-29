@@ -35,9 +35,14 @@ export default function DayPanel({ date, checkins, expenses, businessFlags, onCh
   const bpFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setIsBusiness(businessFlags[date] ?? false);
-    setCustomLoc('');
-  }, [date, businessFlags]);
+  // Auto-fill current location
+  if (loc) setCustomLoc(loc);
+  // Auto-fill business flag from most recent check-in
+  const recentDate = Object.keys(businessFlags)
+    .filter(d => d <= date)
+    .sort((a, b) => b.localeCompare(a))[0];
+  setIsBusiness(recentDate ? !!businessFlags[recentDate] : false);
+}, [date]);
 
   const loc = checkins[date] || Object.entries(checkins)
     .filter(([d]) => d <= date)
