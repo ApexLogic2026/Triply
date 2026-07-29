@@ -3,6 +3,7 @@ import { useState, useRef  } from 'react';
 import { IconMapPin, IconReceipt } from '@tabler/icons-react';
 import { fmtHKD } from '../utils/currency';
 import ExpenseForm from './ExpenseForm';
+import { useState, useRef, useEffect } from 'react';
 
 const CATS = [
   { id: 'food', label: 'Food & Drink', color: '#E1F5EE', ic: '#1D9E75' },
@@ -31,12 +32,15 @@ const [showForm, setShowForm] = useState(false);
 const [customLoc, setCustomLoc] = useState('');
 const [bpImage, setBpImage] = useState<string | null>(null);
 const [bpFileName, setBpFileName] = useState<string | null>(null);
-const [isBusinessOverride, setIsBusinessOverride] = useState<boolean | null>(null);
 const recentCheckinDate = Object.keys(businessFlags)
   .filter(d => d <= date)
   .sort((a, b) => b.localeCompare(a))[0];
 const currentBusiness = recentCheckinDate ? !!businessFlags[recentCheckinDate] : false;
-const isBusiness = isBusinessOverride !== null ? isBusinessOverride : currentBusiness;
+const [isBusiness, setIsBusiness] = useState(currentBusiness);
+
+useEffect(() => {
+  setIsBusiness(currentBusiness);
+}, [date]);
 const bpFileRef = useRef<HTMLInputElement>(null);
   const loc = checkins[date] || Object.entries(checkins)
   .filter(([d]) => d <= date)
