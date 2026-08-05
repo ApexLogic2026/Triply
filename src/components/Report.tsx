@@ -42,17 +42,16 @@ export default function Report({ trips, expenses, checkins, boardingPasses, busi
   const personalTrips = tripsInRange.filter(t => !isTripBusiness(t.start, businessFlags));
 
   function getTripEnd(trip: Trip): string {
-  const isLast = trip.id === tripsInRange[tripsInRange.length - 1].id;
-  if (isLast) return rangeEnd;
-  return new Date(new Date(trip.end + 'T00:00:00').getTime() - 86400000).toISOString().split('T')[0];
-}
-}
+    const isLast = trip.id === tripsInRange[tripsInRange.length - 1].id;
+    if (isLast) return rangeEnd;
+    return new Date(new Date(trip.end + 'T00:00:00').getTime() - 86400000).toISOString().split('T')[0];
+  }
 
-function getTripDates(trip: Trip) {
-  const start = trip.start > rangeStart ? trip.start : rangeStart;
-  const end = getTripEnd(trip);
-  return getDatesInRange(start, end);
-}
+  function getTripDates(trip: Trip) {
+    const start = trip.start > rangeStart ? trip.start : rangeStart;
+    const end = getTripEnd(trip);
+    return getDatesInRange(start, end);
+  }
 
   const businessDays = businessTrips.reduce((s, t) => s + getTripDates(t).length, 0);
   const personalDays = personalTrips.reduce((s, t) => s + getTripDates(t).length, 0);
@@ -76,7 +75,6 @@ function getTripDates(trip: Trip) {
           <span style={{ fontSize: 11, color: '#999' }}>{tripStart} – {tripEnd}</span>
           <span style={{ fontSize: 11, color: '#1D9E75', fontWeight: 500, marginLeft: 8 }}>{tripDates.length} day{tripDates.length > 1 ? 's' : ''}</span>
         </div>
-
         <div style={{ padding: '12px 16px' }}>
           {tripBPs.length > 0 && (
             <div style={{ marginBottom: 12 }}>
@@ -91,7 +89,6 @@ function getTripDates(trip: Trip) {
               ))}
             </div>
           )}
-
           {tripExps.length > 0 ? (
             <div style={{ marginBottom: 12 }}>
               <div style={{ fontSize: 11, fontWeight: 500, color: '#999', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Expenses</div>
@@ -123,7 +120,6 @@ function getTripDates(trip: Trip) {
         <input type="date" value={rangeEnd} onChange={e => setRangeEnd(e.target.value)}
           style={{ fontSize: 12, padding: '6px 10px', borderRadius: 6, border: '0.5px solid #e5e5e3', background: '#fff' }} />
       </div>
-
       {allDates.length === 0 ? (
         <div style={{ fontSize: 13, color: '#999' }}>Select a valid date range</div>
       ) : tripsInRange.length === 0 ? (
@@ -142,21 +138,18 @@ function getTripDates(trip: Trip) {
               <div style={{ fontSize: 11, color: '#0F6E56', marginTop: 2, opacity: 0.7 }}>{personalTrips.length} trip{personalTrips.length !== 1 ? 's' : ''}</div>
             </div>
           </div>
-
           {businessTrips.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 12, fontWeight: 500, color: '#185FA5', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>💼 Business Trips</div>
               {businessTrips.map(renderTrip)}
             </div>
           )}
-
           {personalTrips.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 12, fontWeight: 500, color: '#0F6E56', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>🏖️ Personal Trips</div>
               {personalTrips.map(renderTrip)}
             </div>
           )}
-
           <button onClick={() => exportCSV(expenses, checkins, rangeStart, rangeEnd, businessFlags)}
             style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 6, border: '0.5px solid #e5e5e3', background: '#fff', fontSize: 12, cursor: 'pointer', marginTop: 8 }}>
             <IconDownload size={14} /> Export CSV
