@@ -43,15 +43,14 @@ export default function Report({ trips, expenses, checkins, boardingPasses, busi
 
   function getTripEnd(trip: Trip): string {
   const isLast = trip.id === tripsInRange[tripsInRange.length - 1].id;
-  if (isLast) return rangeEnd;
-  return new Date(new Date(trip.end + 'T00:00:00').getTime() - 86400000).toISOString().split('T')[0];
+  return isLast ? rangeEnd : trip.end;
 }
 
-  function getTripDates(trip: Trip) {
-    const tripStart = trip.start > rangeStart ? trip.start : rangeStart;
-    const tripEnd = getTripEnd(trip);
-    return getDatesInRange(tripStart, tripEnd);
-  }
+function getTripDates(trip: Trip) {
+  const start = trip.start > rangeStart ? trip.start : rangeStart;
+  const end = getTripEnd(trip);
+  return getDatesInRange(start, end);
+}
 
   const businessDays = businessTrips.reduce((s, t) => s + getTripDates(t).length, 0);
   const personalDays = personalTrips.reduce((s, t) => s + getTripDates(t).length, 0);
