@@ -41,9 +41,17 @@ export default function Report({ trips, expenses, checkins, boardingPasses, busi
   const businessTrips = tripsInRange.filter(t => isTripBusiness(t.start, businessFlags));
   const personalTrips = tripsInRange.filter(t => !isTripBusiness(t.start, businessFlags));
 
+  function getTripEnd(trip: Trip): string {
+    const idx = tripsInRange.indexOf(trip);
+    const isLast = idx === tripsInRange.length - 1;
+    if (isLast) return rangeEnd;
+    const nextTrip = tripsInRange[idx + 1];
+    return new Date(new Date(nextTrip.start + 'T00:00:00').getTime() - 86400000).toISOString().split('T')[0];
+  }
+
   function getTripDates(trip: Trip) {
     const tripStart = trip.start > rangeStart ? trip.start : rangeStart;
-    const tripEnd = trip.end < rangeEnd ? trip.end : rangeEnd;
+    const tripEnd = getTripEnd(trip);
     return getDatesInRange(tripStart, tripEnd);
   }
 
@@ -52,8 +60,7 @@ export default function Report({ trips, expenses, checkins, boardingPasses, busi
 
   function renderTrip(trip: Trip) {
     const tripStart = trip.start > rangeStart ? trip.start : rangeStart;
-    const isLast = trip.id === tripsInRange[tripsInRange.length - 1].id;
-    const tripEnd = isLast ? rangeEnd : (trip.end < rangeEnd ? trip.end : rangeEnd);
+    const tripEnd = getTripEnd(trip);
     const tripDates = getDatesInRange(tripStart, tripEnd);
     const tripBPs = (boardingPasses || []).filter(bp => bp.date >= trip.start && bp.date <= trip.end);
     const tripExps = tripDates.flatMap(d => (expenses[d] || []).map(e => ({ ...e, date: d })));
