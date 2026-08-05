@@ -16,9 +16,7 @@ function generateTripsFromCheckins(checkins: Checkins): Trip[] {
     const prev = sorted[index - 1];
     if (!prev || prev[1] !== location) {
       const next = sorted[index + 1];
-const endDate = next
-  ? new Date(new Date(next[0] + 'T00:00:00').getTime() - 86400000).toISOString().split('T')[0]
-  : date;
+const endDate = next ? next[0] : date;
       trips.push({ id: `trip-${date}`, name: location, color: colors[trips.length % colors.length], start: date, end: endDate });
     }
   });
