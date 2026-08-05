@@ -38,26 +38,21 @@ export default function Report({ trips, expenses, checkins, boardingPasses, busi
   const tripsInRange = trips.filter(t => t.start <= rangeEnd && t.end >= rangeStart);
   const allDates = rangeStart && rangeEnd && rangeStart <= rangeEnd ? getDatesInRange(rangeStart, rangeEnd) : [];
 
-  // Split trips into business and personal
   const businessTrips = tripsInRange.filter(t => isTripBusiness(t.start, businessFlags));
   const personalTrips = tripsInRange.filter(t => !isTripBusiness(t.start, businessFlags));
 
-  // Count total days
-  const businessDays = businessTrips.reduce((s, t) => {
-const isLast = trip.id === tripsInRange[tripsInRange.length - 1].id;
-const tripStart = trip.start > rangeStart ? trip.start : rangeStart;
-const tripEnd = isLast ? rangeEnd : (trip.end < rangeEnd ? trip.end : rangeEnd);
+  function getTripDates(trip: Trip) {
+    const tripStart = trip.start > rangeStart ? trip.start : rangeStart;
+    const tripEnd = trip.end < rangeEnd ? trip.end : rangeEnd;
+    return getDatesInRange(tripStart, tripEnd);
+  }
 
-  const personalDays = personalTrips.reduce((s, t) => {
-    const isLast = t.id === tripsInRange[tripsInRange.length - 1].id;
-    const start = t.start > rangeStart ? t.start : rangeStart;
-    const end = isLast ? rangeEnd : (t.end < rangeEnd ? t.end : rangeEnd);
-    return s + getDatesInRange(start, end).length;
-  }, 0);
+  const businessDays = businessTrips.reduce((s, t) => s + getTripDates(t).length, 0);
+  const personalDays = personalTrips.reduce((s, t) => s + getTripDates(t).length, 0);
 
   function renderTrip(trip: Trip) {
-    const isLast = trip.id === tripsInRange[tripsInRange.length - 1].id;
     const tripStart = trip.start > rangeStart ? trip.start : rangeStart;
+    const isLast = trip.id === tripsInRange[tripsInRange.length - 1].id;
     const tripEnd = isLast ? rangeEnd : (trip.end < rangeEnd ? trip.end : rangeEnd);
     const tripDates = getDatesInRange(tripStart, tripEnd);
     const tripBPs = (boardingPasses || []).filter(bp => bp.date >= trip.start && bp.date <= trip.end);
@@ -115,7 +110,6 @@ const tripEnd = isLast ? rangeEnd : (trip.end < rangeEnd ? trip.end : rangeEnd);
 
   return (
     <div>
-      {/* Date range picker */}
       <div style={{ display: 'flex', gap: 10, marginBottom: 20, alignItems: 'center' }}>
         <input type="date" value={rangeStart} onChange={e => setRangeStart(e.target.value)}
           style={{ fontSize: 12, padding: '6px 10px', borderRadius: 6, border: '0.5px solid #e5e5e3', background: '#fff' }} />
@@ -130,7 +124,6 @@ const tripEnd = isLast ? rangeEnd : (trip.end < rangeEnd ? trip.end : rangeEnd);
         <div style={{ fontSize: 13, color: '#999' }}>No trips found in this date range</div>
       ) : (
         <>
-          {/* Summary */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
             <div style={{ background: '#E6F1FB', borderRadius: 8, padding: 12 }}>
               <div style={{ fontSize: 11, color: '#185FA5', marginBottom: 4 }}>💼 Business Days</div>
@@ -144,7 +137,6 @@ const tripEnd = isLast ? rangeEnd : (trip.end < rangeEnd ? trip.end : rangeEnd);
             </div>
           </div>
 
-          {/* Business trips */}
           {businessTrips.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 12, fontWeight: 500, color: '#185FA5', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>💼 Business Trips</div>
@@ -152,7 +144,6 @@ const tripEnd = isLast ? rangeEnd : (trip.end < rangeEnd ? trip.end : rangeEnd);
             </div>
           )}
 
-          {/* Personal trips */}
           {personalTrips.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 12, fontWeight: 500, color: '#0F6E56', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>🏖️ Personal Trips</div>
